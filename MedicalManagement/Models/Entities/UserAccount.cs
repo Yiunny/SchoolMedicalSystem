@@ -18,7 +18,7 @@ namespace MedicalManagement.Models.Entities
         [Required]
         [Column("password")]
         [StringLength(255)]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         [Column("role")]
         [StringLength(50)]
@@ -32,6 +32,7 @@ namespace MedicalManagement.Models.Entities
 
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
+
 
         [Column("created_date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;

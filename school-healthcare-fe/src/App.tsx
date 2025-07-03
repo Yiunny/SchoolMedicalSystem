@@ -2,6 +2,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { useAuthStore } from "@/auth/useAuthStore";
+import FirstTimeChangePasswordPage from "@/pages/Login/FirstTimeChangePasswordPage";
+import HomePage from "@/pages/Home/HomePage";
 import LoginPage from "@/pages/Login/LoginPage";
 import ForgotPasswordPage from "@/pages/Login/ForgotPasswordPage";
 import ProtectedRouteByRole from "@/auth/ProtectedRouteByRole";
@@ -9,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ParentDashboard from "@/pages/Parent/ParentDashboard"; // ✅ đường dẫn thật
 import UserProfile from "./pages/Profile/UserProfile";
 import ChangePasswordPage from "./pages/Login/ChangePasswordPage";
+
 
 
 // Dummy dashboard components (sau có thể import thật)
@@ -41,7 +44,13 @@ function App() {
             )
           }
         />
-
+        {/* Trang chủ */}
+        <Route path="/home" element={<HomePage />} />
+        {/* Trang đổi mật khẩu lần đầu */}
+        <Route
+          path="/first-time-change-password"
+          element={<FirstTimeChangePasswordPage />}
+        />
         {/* Dashboard theo role */}
         <Route
           path="/parent/dashboard"

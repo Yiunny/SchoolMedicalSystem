@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Collections.Generic;
+using static MedicalManagement.Helpers.PasswordHelper;
+
 
 namespace MedicalManagement.Services
 {
@@ -24,27 +26,34 @@ namespace MedicalManagement.Services
             _context = context;
             _jwtHelper = jwtHelper;
             _emailService = emailService;
-        }   
+        }
 
         public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDTO dto)
         {
-            var user = await _context.UserAccounts.FirstOrDefaultAsync(u => u.UserId == userId && u.IsActive);
+            var user = await _context.UserAccounts.FindAsync(userId);
             if (user == null) return false;
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.Password))
-                throw new Exception("Mật khẩu cũ không chính xác.");
+            if (user.IsFirstLogin)
+            {
+                // ✅ Nếu là lần đầu, không cần kiểm tra mật khẩu cũ
+                user.PasswordHash = HashPassword(dto.NewPassword);
+                user.IsFirstLogin = false;
+            }
+            else
+            {
+                // ⚠️ Nếu không phải lần đầu, bắt buộc kiểm tra old password
+                if (!VerifyPassword(dto.OldPassword, user.PasswordHash))
+                {
+                    throw new Exception("Mật khẩu hiện tại không đúng.");
+                }
 
-            // Kiểm tra độ mạnh của mật khẩu mới
-            var strong = Regex.IsMatch(dto.NewPassword, @"^(?=.*[A-Z])(?=.*[\W_]).{8,}$");
-            if (!strong)
-                throw new Exception("Mật khẩu mới phải ≥8 ký tự, có chữ in hoa và ký tự đặc biệt.");
-
-            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
-            user.IsFirstLogin = false;
+                user.PasswordHash = HashPassword(dto.NewPassword);
+            }
 
             await _context.SaveChangesAsync();
             return true;
         }
+
 
 
         public async Task<AuthResponse> LoginAsync(LoginDTO loginDto)
@@ -67,7 +76,7 @@ namespace MedicalManagement.Services
                 }
             }
 
-            if (matchedUser == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, matchedUser.Password))
+            if (matchedUser == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, matchedUser.PasswordHash))
             {
                 return new AuthResponse
                 {
@@ -196,7 +205,7 @@ namespace MedicalManagement.Services
             if (!PasswordValidator.IsStrong(newPassword))
                 throw new Exception("Mật khẩu mới phải ≥8 ký tự, có chữ in hoa và ký tự đặc biệt.");
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
             otpValid.IsUsed = true;
             await _context.SaveChangesAsync();
 

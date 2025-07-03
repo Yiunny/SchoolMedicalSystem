@@ -47,7 +47,6 @@ const ChangePasswordPage = () => {
       setLoading(true);
 
       await axios.post("/auth/change-password", {
-        oldPassword: form.oldPassword,
         newPassword: form.newPassword
       });
 

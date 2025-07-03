@@ -68,7 +68,7 @@ namespace MedicalManagement.Services
             var user = new UserAccount
             {
                 Username = dto.Username,
-                Password = hashedPassword,
+                PasswordHash = hashedPassword,
                 Role = dto.Role,
                 ReferenceId = referenceId,
                 CreatedBy = dto.CreatedBy,
@@ -94,7 +94,7 @@ namespace MedicalManagement.Services
             var user = await _context.UserAccounts.FindAsync(dto.UserId);
             if (user == null) return false;
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             user.IsFirstLogin = true;
             await _context.SaveChangesAsync();
             return true;
@@ -199,7 +199,7 @@ namespace MedicalManagement.Services
                     var user = new UserAccount
                     {
                         Username = dto.Username,
-                        Password = hashedPw,
+                        PasswordHash = hashedPw,
                         Role = dto.Role,
                         ReferenceId = refId,
                         CreatedBy = createdByAdminId,

@@ -42,7 +42,7 @@ namespace MedicalManagement.Data
                 entity.ToTable("User_Account");
                 entity.Property(e => e.UserId).HasColumnName("user_id");
                 entity.Property(e => e.Username).HasColumnName("username");
-                entity.Property(e => e.Password).HasColumnName("password");
+                entity.Property(e => e.PasswordHash).HasColumnName("password");
                 entity.Property(e => e.Role).HasColumnName("role");
                 entity.Property(e => e.ReferenceId).HasColumnName("reference_id");
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
